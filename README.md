@@ -1,3 +1,6 @@
+## 下载爬虫图片
+通过修改topic, 可在多台服务器部署，做到分布式爬取
+
 1. 配置文件解读
 
     kafka_host: kafka地址，例如：kafka1.jujin8.com:9092,kafka2.jujin8.com:9092,kafka3.jujin8.com:9092
