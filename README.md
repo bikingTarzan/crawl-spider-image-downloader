@@ -28,8 +28,8 @@
     
     参数：
     
-    * a: image | file, 下载图片或者文件   
-    * c: True | False | 不填， 是否控制台输出，不填则看.env文件的配置
+        a: image | file, 下载图片或者文件   
+        c: True | False | 不填， 是否控制台输出，不填则看.env文件的配置
         
 3. 依赖
 
