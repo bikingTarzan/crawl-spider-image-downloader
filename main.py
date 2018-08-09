@@ -25,6 +25,8 @@ if __name__ == '__main__':
         action = "download_img_with_thumb"
     elif action_name == 'file':
         action = "download_file"
+    elif action_name == 'error':
+        action = "download_error_list"
 
     if action:
         console = None if console == 'None' else console == 'True'

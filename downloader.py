@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import redis, os, contextlib, urllib2, datetime, logging, io
+import redis, os, contextlib, urllib2, datetime, logging, io, time
 from pykafka import KafkaClient
 from PIL import Image
 from dotenv import load_dotenv
@@ -35,6 +35,8 @@ class downloader(object):
     def set_logger(self):
         now = datetime.datetime.now().strftime("%Y%m%d")
         if self.handler is None or now != self.day_now:
+            self.day_now = now
+
             log_dir = os.path.join("logs", now)
             if not os.path.exists(log_dir):
                 os.mkdir(log_dir)
@@ -71,6 +73,15 @@ class downloader(object):
     def handle_url(self, file_url):
         file_url = file_url.replace("https:///", "https://")
         file_url = file_url.replace("http:///", "http://")
+
+        try:
+            # 处理 url链接不以 "http" 开头的问题
+            index_of_http = file_url.index("http")
+            if index_of_http != 0:
+                file_url = file_url[index_of_http:]
+
+        except Exception, e:
+            self.logger.error("[handle url failed] %s " % file_url, exc_info=True)
 
         return file_url
 
@@ -138,6 +149,32 @@ class downloader(object):
                     except Exception, e:
                         self.logger.error("[down file error] %s " % down_file, exc_info=True)
                         self.r.sadd('downfile_error', down_file)
+
+    # 重新下载出错的图片
+    def download_error_list(self):
+        file_url = self.r.spop('downfile_error')
+        while file is not None:
+            if file is None:
+                self.logger.info("[no error file to download]")
+                time.sleep(60)
+
+            fileinfo = file_url.split('_____')
+            file_url = fileinfo[0]
+            file_save_path = fileinfo[1]
+
+            save_dir = os.path.dirname(file_save_path)
+            if not os.path.exists(save_dir):
+                os.makedirs(save_dir)
+
+            try:
+                if not os.path.exists(file_save_path):
+                    file_url = self.handle_url(file_url)
+                    with contextlib.closing(urllib2.urlopen(file_url)) as fimg:
+                        with open(file_save_path, 'wb') as bfile:
+                            bfile.write(fimg.read())
+            except Exception, e:
+                self.logger.error("[down error list error] %s " % down_file, exc_info=True)
+
 
     # 检查下载的文件，并创建下载路径
     def check_download_file(self, info):
