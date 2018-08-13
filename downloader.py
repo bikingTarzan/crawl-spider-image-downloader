@@ -107,11 +107,11 @@ class downloader(object):
             if message is not None:
                 try:
                     img_file = message.value
-                    self.logger.info("[Begin download image] %s" % img_file)
                     check_file = self.check_dowload_image(img_file)
                     if check_file is not None:
                         # 更新日志
                         self.set_logger()
+                        self.logger.info("[Begin download image] %s" % img_file)
 
                         (file_url, file_save_path, img_thumb_path) = check_file
                         with contextlib.closing(urllib2.urlopen(file_url, timeout=self.download_time_out)) as fimg:
@@ -135,12 +135,12 @@ class downloader(object):
         for message in consumer:
             if message is not None:
                 down_file = message.value
-                self.logger.info("[Begin download file] %s" % down_file)
                 check_file = self.check_download_file(down_file)
 
                 if check_file is not None:
                     # 更新日志
                     self.set_logger()
+                    self.logger.info("[Begin download file] %s" % down_file)
                     try:
                         (file_url, file_save_path) = check_file
                         with contextlib.closing(urllib2.urlopen(file_url, timeout=self.download_time_out)) as fimg:
