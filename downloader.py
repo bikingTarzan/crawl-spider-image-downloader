@@ -83,7 +83,7 @@ class downloader(object):
         except Exception, e:
             self.logger.error("[handle url failed] %s " % file_url, exc_info=True)
 
-        return urllib2.quote(file_url)
+        return file_url
 
     # 获取consumer
     def get_consumer(self, topic):
